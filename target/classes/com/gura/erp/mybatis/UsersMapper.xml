@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="users">
+
+<!-- 사원정보 가져오기-->
+<select id="getData" parameterType="int" resultType="usersDto">
+	SELECT staff_name, jumin_no, jumin_no2, gender, school_code, department_code, graduate_day
+	FROM staff
+	WHERE staff_no=#{staff_no}
+</select>
+
+<!-- skill_code 불러오기-->
+<select id="getSkillList" parameterType="int" resultType="usersDto">
+	SELECT a.skill_code, b.skill_name
+	FROM staff_skill a
+	JOIN code_skill b ON a.skill_code = b.skill_code
+	WHERE a.staff_no = #{staff_no}
+</select>
+<!-- 사원 리스트 출력/ 페이징 처리 -->
+<select id="getList" parameterType="list" resultType="usersDto">
+	SELECT * 
+	from(
+	    SELECT list.*, ROWNUM as RNUM
+	    from(
+	        SELECT a.staff_no, a.staff_name, a.gender, b.department_name, a.graduate_day
+	        FROM staff a
+	        JOIN code_department b
+	        ON a.department_code = b.department_code
+	        ORDER BY a.staff_no DESC
+	    )list)
+	WHERE RNUM BETWEEN #{startRowNum} AND #{endRowNum}
+</select>
+<!-- rownum가져오기 -->
+<select id="getCount" resultType="int">
+	SELECT NVL(MAX(ROWNUM), 0)
+	FROM staff
+</select>
+<!-- 사원 추가 -->
+<insert id="insert" parameterType="map">
+	INSERT INTO staff
+	(staff_no, staff_name, jumin_no, school_code, department_code, graduate_day, gender, jumin_no2)
+	VALUES(staff_seq.nextval, #{staff_name}, #{jumin_no}, #{school_code}, #{department_code}, #{graduate_day}, #{gender}, #{jumin_no2})
+</insert>
+<!-- 사원 skill추가 -->
+<insert id="insertSkill" parameterType="map">
+	<selectKey keyProperty="staff_no" resultType="Integer" order="BEFORE">
+        SELECT MAX(staff_no) FROM staff
+    </selectKey>
+	INSERT INTO staff_skill (staff_skill_no, staff_no, skill_code) 
+	SELECT staff_skill_seq.nextval, SK.*
+	FROM(
+		<foreach collection="skill_code" item="skillCode" separator="UNION ALL">
+			SELECT #{staff_no} AS staff_no, #{skillCode} AS skill_code
+			FROM DUAL
+		</foreach>
+	) SK
+</insert>
+<!-- 사원 번호 가져오기 -->
+<select id="getUserNo" resultType="int">
+	select staff_no from staff where staff_no = #{staff_no}
+</select>
+<!-- 사원정보 수정하기 -->
+<update id="update" parameterType="usersDto">
+	UPDATE staff
+	SET 
+			staff_name=#{staff_name}, 
+			jumin_no=#{jumin_no }, 
+			jumin_no2=#{jumin_no2 }, 
+			gender=#{gender }, 
+			school_code=#{school_code }, 
+			department_code=#{department_code }, 
+			graduate_day=#{graduate_day}
+	WHERE staff_no=#{staff_no }
+</update>
+<!-- 사원 skill정보 새로 추가-->
+<insert id="updateSkill" parameterType="map">
+    <selectKey keyProperty="staff_no" resultType="Integer" order="BEFORE">
+        SELECT staff_no FROM staff WHERE staff_no = #{staff_no}
+    </selectKey>
+	UPDATE staff_skill  
+	SET (staff_no, skill_code) = ( SELECT SK.*
+			FROM (
+			<foreach collection="skill_code" item="skillCode" separator="UNION ALL">
+				SELECT #{staff_no} AS staff_no, #{skillCode} AS skill_code
+				FROM DUAL
+			</foreach>
+	) SK )
+	WHERE staff_no = #{staff_no}
+</insert>
+<!-- 사원 skill정보 삭제 -->
+<delete id="deleteSkill" parameterType="int">
+	DELETE FROM staff_skill
+	WHERE staff_no = #{staff_no}
+</delete>
+<!-- 사원정보 삭제 -->
+<delete id="delete" parameterType="int">
+	DELETE FROM staff
+	WHERE staff_no=#{staff_no}
+</delete>
+<!-- 기타 등등 리스트 조회 -->
+<select id="schoolList" resultType="usersDto">
+    SELECT * FROM code_school ORDER BY school_code
+</select>
+
+<select id="skillList" resultType="usersDto">
+   SELECT * FROM code_skill ORDER BY skill_code
+</select>
+
+</mapper>
