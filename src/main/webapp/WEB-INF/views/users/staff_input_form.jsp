@@ -30,7 +30,7 @@
 						</th>
 						<th>주민 번호</th>
 						<th>
-							<input type="text" name="jumin_no" id="jumin_no" style="width: 120;"/> - <input type="password" name="jumin_no2" id="jumin_no2" maxlength="7" style="width: 120;"/>
+							<input type="text" name="jumin_no" id="jumin_no" maxlength="6" style="width: 120;"/> - <input type="password" name="jumin_no2" id="jumin_no2" maxlength="7" style="width: 120;"/>
 						</th>
 						<th>성별</th>
 						<th>
