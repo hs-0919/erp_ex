@@ -4,7 +4,8 @@
 
 <!-- 사원정보 가져오기-->
 <select id="getData" parameterType="int" resultType="usersDto">
-	SELECT staff_name, jumin_no, jumin_no2, gender, school_code, department_code, graduate_day
+	SELECT staff_name, jumin_no, jumin_no2, gender, school_code, department_code, 
+	       graduate_day, SUBSTR(graduate_day, '0','4') as graduateYear, SUBSTR(graduate_day, '6','7') as graduateMonth
 	FROM staff
 	WHERE staff_no=#{staff_no}
 </select>
@@ -16,11 +17,12 @@
 	JOIN code_skill b ON a.skill_code = b.skill_code
 	WHERE a.staff_no = #{staff_no}
 </select>
-<!-- 사원 리스트 출력/ 페이징 처리 -->
-<select id="getList" parameterType="list" resultType="usersDto">
-	SELECT * 
-	from(
-	    SELECT list.*, ROWNUM as RNUM
+
+
+<!-- 전체사원 리스트 출력/ 페이징 처리 -->
+<select id="getList" parameterType="usersDto" resultType="usersDto">
+SELECT * 
+	from( SELECT list.*, ROWNUM as RNUM
 	    from(
 	        SELECT a.staff_no, a.staff_name, a.gender, b.department_name, a.graduate_day
 	        FROM staff a
@@ -28,18 +30,20 @@
 	        ON a.department_code = b.department_code
 	        ORDER BY a.staff_no DESC
 	    )list)
-	WHERE RNUM BETWEEN #{startRowNum} AND #{endRowNum}
+	WHERE RNUM BETWEEN #{startRow} AND #{endRow}
 </select>
-<!-- rownum가져오기 -->
+
+<!-- rownum가져오기/ 전체 수 -->
 <select id="getCount" resultType="int">
-	SELECT NVL(MAX(ROWNUM), 0)
+	SELECT count(*)
 	FROM staff
 </select>
+
 <!-- 사원 추가 -->
 <insert id="insert" parameterType="map">
 	INSERT INTO staff
 	(staff_no, staff_name, jumin_no, school_code, department_code, graduate_day, gender, jumin_no2)
-	VALUES(staff_seq.nextval, #{staff_name}, #{jumin_no}, #{school_code}, #{department_code}, #{graduate_day}, #{gender}, #{jumin_no2})
+	VALUES(staff_seq.nextval, #{staff_name}, #{jumin_no}, #{school_code}, #{department_code}, #{graduateDayS}, #{gender}, #{jumin_no2})
 </insert>
 <!-- 사원 skill추가 -->
 <insert id="insertSkill" parameterType="map">
@@ -72,6 +76,7 @@
 			graduate_day=#{graduate_day}
 	WHERE staff_no=#{staff_no }
 </update>
+
 <!-- 사원 skill정보 새로 추가-->
 <insert id="updateSkill" parameterType="map">
     <selectKey keyProperty="staff_no" resultType="Integer" order="BEFORE">
@@ -87,16 +92,19 @@
 	) SK )
 	WHERE staff_no = #{staff_no}
 </insert>
+
 <!-- 사원 skill정보 삭제 -->
 <delete id="deleteSkill" parameterType="int">
 	DELETE FROM staff_skill
 	WHERE staff_no = #{staff_no}
 </delete>
+
 <!-- 사원정보 삭제 -->
 <delete id="delete" parameterType="int">
 	DELETE FROM staff
 	WHERE staff_no=#{staff_no}
 </delete>
+
 <!-- 기타 등등 리스트 조회 -->
 <select id="schoolList" resultType="usersDto">
     SELECT * FROM code_school ORDER BY school_code
@@ -104,6 +112,10 @@
 
 <select id="skillList" resultType="usersDto">
    SELECT * FROM code_skill ORDER BY skill_code
+</select>
+
+<select id="departList" resultType="usersDto">
+   SELECT * FROM code_department ORDER BY department_code
 </select>
 
 </mapper>

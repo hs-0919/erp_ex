@@ -1,112 +1,98 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="search">
-<sql id="search">
-	<where>
-		<if test="staff_name != null and staff_name != '' ">
-			AND staff_name LIKE '%'||#{staff_name}||'%'
-		</if>
-		<if test="gender.size() != 0 ">
-			AND SUBSTR(jumin_no2,8,1) IN
-			<foreach collection="gender" item="item" open="(" close=")" separator=",">
-				CASE
-					WHEN #{item} = '남' then '1'
-					ELSE  '2'
-				END,
-				CASE
-					WHEN #{item} = '남' then '3'
-					ELSE  '4'
-				END,
-				CASE
-					WHEN #{item} = '남' then '5'
-					ELSE  '6'
-				END,
-				CASE
-					WHEN #{item} = '남' then '7'
-					ELSE  '8'
-				END,
-				CASE
-					WHEN #{item} = '남' then '9'
-					ELSE  '0'
-				END
-			</foreach>
-		</if>
-		<if test="department_code != null and department_code != '' ">
-			AND department_code IN #{department_code}
-		</if>
-		<if test="school_code.size() != 0">
-			AND school_code IN
-				<foreach collection="school_code" item="item" open="(" close=")" separator=",">
-					#{item}
-				</foreach>
-		</if>
-		<if test="skill_code() != 0 ">
-			AND staff_no IN 
-				(	SELECT staff_no
-					FROM staff_skill
-					WHERE skill_code IN 
-					<foreach collection="skill_code" item="item" open="(" close=")" separator=",">
-						#{item}
-					</foreach>
-				)
-		</if>
-		<if test="graduate_day != '' and graduate_day_e != ''">
-			AND graduate_day 
-			BETWEEN to_date(#{graduate_day},'yyyy-MM')
-			AND to_date(#{graduate_day_e},'yyyy-MM')
-		</if>
-		<if test="keyword_type != '' and keyword != '' ">
-			<choose>
-				<when test="keyword_type == 'or' ">
-					 OR staff_no IN
-					(
-						SELECT staff_no
-						FROM staff_skill
-						WHERE skill_code IN
-											( SELECT skill_code 
-												FROM code_skill
-												WHERE LOWER(skill_name)
-												LIKE LOWER('%'||#{keyword}||'%')
-											) 
-					)
-				</when>
-				<when test="keyword_type == 'and' ">
-					AND staff_no IN
-					(
-						SELECT staff_no
-						FROM staff_skill
-						WHERE skill_code IN
-											( SELECT skill_code 
-												FROM code_skill
-												WHERE LOWER(skill_name)
-												LIKE LOWER('%'||#{keyword}||'%')
-											) 
-					)
-				</when>
-			</choose>
-		</if>
-	</where>
-</sql>
+
 <!-- 사원 리스트 출력/ 페이징 처리 -->
-<select id="getSearchList" parameterType="list" resultType="searchDto">
+<select id="getSearchList" parameterType="map" resultType="searchDto">
 	SELECT * 
-	from(
-	    SELECT list.*, ROWNUM as RNUM
+	from( SELECT list.*, ROWNUM as RNUM
 	    from(
-	        SELECT a.staff_no, a.staff_name, a.gender, b.department_name, a.graduate_day
+	        SELECT DISTINCT a.staff_no, a.staff_name, a.gender, a.school_code, a.department_code, b.department_name, a.graduate_day
 	        FROM staff a
 	        JOIN code_department b
 	        ON a.department_code = b.department_code
-	        ORDER BY a.staff_no DESC
-	    )list)
-	WHERE RNUM BETWEEN #{startRowNum} AND #{endRowNum}
-	<include refid="search" />
+	        LEFT JOIN staff_skill sk
+            ON a.staff_no = sk.staff_no
+            JOIN code_skill cs
+            ON sk.skill_code = cs.skill_code
+			<where>
+				<if test="staff_name != null and staff_name != '' ">
+				    AND a.staff_name LIKE '%'||#{staff_name}||'%'
+				</if>
+				<if test="gender != null and gender.size != 0">
+					${keyword_type} a.gender IN(
+					<foreach collection="gender" item="Gender" separator=",">#{Gender}</foreach>
+					)
+				</if>
+				<if test="department_code != 0 and department_code != null">
+					${keyword_type} a.department_code = #{department_code}
+				</if>
+				<if test="school_code != null and school_code.size != 0">
+					${keyword_type} a.school_code IN(
+					<foreach collection="school_code" item="SCode" separator=",">#{SCode}</foreach>
+					)
+				</if>
+				<if test="skill_code != null and skill_code.size != 0">
+					${keyword_type} sk.skill_code IN(
+					<foreach collection="skill_code" item="SKCode" separator=",">#{SKCode}</foreach>
+					)
+				</if>
+				<if test="graduateDayStart != null and graduateDayStart != '' and graduateDayEnd != null and graduateDayEnd !='' ">
+					${keyword_type} a.graduate_day BETWEEN TO_CHAR(TO_DATE(#{graduateDayStart}, 'yyyyMM'),'yyyyMM') and TO_CHAR(TO_DATE(#{graduateDayEnd}, 'yyyyMM'),'yyyyMM')
+				</if>
+				<if test="keyword != null and keyword != '' ">
+					${keyword_type} cs.skill_name LIKE '%' || #{keyword} || '%'
+				</if>
+			</where>
+	        ORDER BY a.staff_no DESC) list)
+	WHERE RNUM BETWEEN #{startRow} AND #{endRow}
+
+	
 
 </select>
 <!-- rownum가져오기 -->
-<select id="getCount" resultType="int">
-	SELECT NVL(MAX(ROWNUM), 0)
-	FROM staff
+<select id="getSearchCount" parameterType="map" resultType="int">
+	SELECT count(*)
+	From (
+		SELECT DISTINCT a.staff_no
+		FROM staff a
+        JOIN code_department b
+        ON a.department_code = b.department_code
+        LEFT JOIN staff_skill sk
+        ON a.staff_no = sk.staff_no
+        JOIN code_skill cs
+        ON sk.skill_code = cs.skill_code
+        <where>
+			<if test="staff_name != null and staff_name != '' ">
+				a.staff_name LIKE '%'||#{staff_name}||'%'
+			</if>
+			<if test="gender != null and gender.size != 0">
+				${keyword_type} a.gender IN(
+				<foreach collection="gender" item="Gender" separator=",">#{Gender}</foreach>
+				)
+			</if>
+			<if test="department_code != 0 and department_code != '' ">
+				${keyword_type} a.department_code = #{department_code}
+			</if>
+			<if test="school_code != null and school_code.size != 0">
+				${keyword_type} a.school_code IN(
+					<foreach collection="school_code" item="SCode" separator=",">#{SCode}</foreach>
+				)
+			</if>
+			<if test="skill_code != null and skill_code.size != 0">
+				${keyword_type} sk.skill_code IN(
+					<foreach collection="skill_code" item="SKCode" separator=",">#{SKCode}</foreach>
+				)
+			</if>
+			<if test="graduateDayStart != null and graduateDayStart != '' and graduateDayEnd != null and graduateDayEnd !='' ">
+				${keyword_type} a.graduate_day BETWEEN TO_CHAR(TO_DATE(#{graduateDayStart}, 'yyyyMM'),'yyyyMM') and TO_CHAR(TO_DATE(#{graduateDayEnd}, 'yyyyMM'),'yyyyMM')
+			</if>
+			<if test="keyword != null and keyword != '' ">
+				${keyword_type} cs.skill_name LIKE '%' || #{keyword} || '%'
+			</if>
+		</where>
+	)
+	
 </select>
 
 
