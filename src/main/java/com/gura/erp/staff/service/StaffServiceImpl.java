@@ -50,7 +50,7 @@ public class StaffServiceImpl implements StaffService{
 	public int getSearchCount(Map<Object, Object> search) {
 		return dao.getSearchCount(search);
 	}
-	
+
 	// 기타 등등 리스트 조회
 	@Override
 	public List<UsersDto> getSchoolList() {

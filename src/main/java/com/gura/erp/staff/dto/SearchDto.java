@@ -2,8 +2,6 @@ package com.gura.erp.staff.dto;
 
 import java.util.List;
 
-import org.springframework.web.util.UriComponentsBuilder;
-
 public class SearchDto {
 	//staff
 	private int staff_no;
@@ -35,25 +33,25 @@ public class SearchDto {
 	private String keyword;
 	private String keyword_type;
 	
-	//paging
-	private int pageCount;   // 한 페이지 몇개 표시
+	//paging 
 	private int displayCount;// 하단 페이징바 몇개 표시
-	private int pageNum;     // 현재 페이지 
 	private int totalCount;  // 게시글 총개수
 	private int maxPage;     // 페이지 최대개수
 	private int startRowNum; // 시작 페이지
 	private int endRowNum;   // 마지막 페이지 
 	private int prevNum;
 	private int nextNum;
-
-	public SearchDto() {};
+	private int pageNum; 	 // 페이지 수
+	private int pageCount;   // 한 페이지 몇개 표시
+	
+	public SearchDto() {}
 	
 	public SearchDto(int staff_no, String staff_name, String gender, String jumin_no, int jumin_no2,
 			List<Integer> school_code, String school_name, int department_code, String department_name,
 			List<Integer> skill_code, String skill_name, int graduate_day, int graduate_day_e, String keyword,
 			String keyword_type,int startRowNum, int endRowNum, int prevNum, int nextNum, String startYear, String startMonth,
-			String graduateYear, String graduateMonth, String graduateDayStart, String graduateDayEnd, int pageCount,
-			int displayCount, int pageNum, int totalCount, int maxPage) {
+			String graduateYear, String graduateMonth, String graduateDayStart, String graduateDayEnd,
+			int displayCount, int totalCount, int maxPage, int pageNum, int pageCount) {
 		super();
 		this.staff_no = staff_no;
 		this.staff_name = staff_name;
@@ -76,36 +74,17 @@ public class SearchDto {
 		this.graduateDayEnd = graduateDayEnd;
 		this.keyword = keyword;
 		this.keyword_type = keyword_type;
-		this.pageCount = pageCount;
 		this.displayCount = displayCount;
-		this.pageNum = pageNum;
 		this.totalCount = totalCount;
 		this.maxPage = maxPage;
 		this.startRowNum = startRowNum;
 		this.endRowNum = endRowNum;
 		this.prevNum = prevNum;
 		this.nextNum = nextNum;
+		this.pageCount = pageCount;
+		this.pageNum = pageNum;
 	}
-	// p 349
-	  // 가장 편리한 점 한글 처리에 신경쓰지 않아도 된다.
-	  // 쿼리스트링(queryString)
-	  // UriComponentsBuilder 클래스 라이브러리 사용해서 자동으로
-	  // ?pageNum=2&amount=10&keyword=kenik&type=W  이렇게 뒤에 붙는다. (jsp에서 지저분하게 안해도 됨)   
-	  public String getListLink() {
-	     String path = "";
-	     UriComponentsBuilder builder  = 
-	           UriComponentsBuilder.fromPath(path)
-	           .queryParam("pageNum", this.pageNum)
-	           .queryParam("amount", this.amount)
-	           .queryParam("type", this.getType())
-	           .queryParam("keyword", this.keyword) 
-	           ;      
-	     return builder.toUriString();
-	  }
-
-
-
-
+	
 	public int getStaff_no() {
 		return staff_no;
 	}
@@ -373,5 +352,7 @@ public class SearchDto {
 	public void setNextNum(int nextNum) {
 		this.nextNum = nextNum;
 	}
+	
+	
 	
 }

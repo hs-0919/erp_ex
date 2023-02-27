@@ -191,6 +191,14 @@ $(function(){
 		       }	
 	    });
 	});*/
+	
+});
+var reform = $("#reform");
+$(".page-item a").on("click", function (e){
+    e.preventDefault();
+    console.log("click");
+    reform.find("input[name='pageNum']").val($(this).attr("href")); //$(this).attr("href") == x페이지
+    reform.submit();
 });
 
 
@@ -290,22 +298,25 @@ $(function(){
 							<input type="radio" id="or" name="keyword_type" value="or"/>
 							<label for="or">or</label>
 							
+							<input type='hidden' name='staff_no' value='<c:out value="${staff_no}"/>' />
+							<input type='hidden' name='pageNum' value='<c:out value="${pageNum}"/>' /> 
+     					    <input type='hidden' name='pageCount' value='<c:out value="${pageCount}"/>' />
 						</th>
 					</tr>
 				</tbody>
 			</table>
 			<div>
 				<input type="button" class="btn btn-primary" id="search" value="검색"/>
-				<input type="button" class="btn btn-primary" id="allSearch" onclick="location.href='${pageContext.request.contextPath}/staff/staff_search_form.do'" value="전부 검색" />
+				<input type="button" class="btn btn-primary" id="allSearch" onclick="location.href='${pageContext.request.contextPath}/staff/staff_search_form.do" value="전부 검색" />
 				<input type="reset"  class="btn btn-warning" value="초기화"/>
 				<input type="button" class="btn btn-success" onclick="location.href='${pageContext.request.contextPath}/staff/staff_input_form.do'" value="등록 하기" />
 			</div>
 			</form>
-			<form id="reform" method="GET">
-				 <input type='hidden' name='pageNum' value='<c:out value="${SearchDto.pageNum}"/>' />
-				 <input type='hidden' name='staff_no' value='<c:out value="${SearchDto.staff_no}"/>' />
-				 <input type='hidden' name='keyword' value='<c:out value="${SearchDto.keyword}"/>' />
-				 <input type='hidden' name='keyword_type' value='<c:out value="${SearchDto.keyword_type}"/>' />
+			<form id="reform" method="GET" action="${pageContext.request.contextPath}/staff/staff_search.do">
+				 <input type='hidden' name='pageNum' value='<c:out value="${pageNum}"/>' /> 
+     			 <input type='hidden' name='pageCount' value='<c:out value="${pageCount}"/>' />
+				 <input type='hidden' name='keyword' value='<c:out value="${keyword}"/>' />
+				 <input type='hidden' name='keyword_type' value='<c:out value="${keyword_type}"/>' />
 			</form>
 	
 		</div>
@@ -343,8 +354,8 @@ $(function(){
 	                </tbody>
 	            </table>
 	        </div>
-	        <nav aria-label="Page navigation example">
-				<ul class="pagination justify-content-center">
+	        <nav>
+			    <ul class="pagination justify-content-center">
 					<c:if test="${pageNum ne 1}">
 						<li class="page-item">
 							<a class="page-link" href="${pageContext.request.contextPath}/staff/staff_search.do?pageNum=${pageNum - 1}">이전</a>
@@ -357,7 +368,7 @@ $(function(){
 									<a class="page-link" href="${pageContext.request.contextPath}/staff/staff_search.do?pageNum=${i}">${i} </a>
 								</c:when>
 								<c:when test="${i != pageNum }">
-									<a class="page-link" href="${pageContext.request.contextPath}/staff/staff_search.do?pageNum=${i}&">${i} </a>
+									<a class="page-link" href="${pageContext.request.contextPath}/staff/staff_search.do?pageNum=${i}">${i} </a>
 								</c:when>
 							</c:choose>
 						</li>

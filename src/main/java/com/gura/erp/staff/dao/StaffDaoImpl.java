@@ -73,7 +73,6 @@ public class StaffDaoImpl implements StaffDao{
 		return session.selectOne("search.getSearchCount", search);
 	}
 	
-	
 	//기타 등등 리스트 조회
 	@Override
 	public List<UsersDto> schoolList() {

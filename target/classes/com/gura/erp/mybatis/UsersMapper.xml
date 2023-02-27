@@ -33,7 +33,7 @@ SELECT *
 	WHERE RNUM BETWEEN #{startRow} AND #{endRow}
 </select>
 
-<!-- rownum가져오기/ 전체 수 -->
+<!-- 전체 사원 수 -->
 <select id="getCount" resultType="int">
 	SELECT count(*)
 	FROM staff

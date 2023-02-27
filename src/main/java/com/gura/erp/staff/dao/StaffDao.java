@@ -19,7 +19,7 @@ public interface StaffDao {
 	//검색 사원정보 조회
 	public List<SearchDto> getSearchList(Map<Object, Object> search, SearchDto ser);
 	public int getSearchCount(Map<Object, Object> search);
-	
+
 	//기타 등등 리스트 조회
 	public List<UsersDto> schoolList();
 	public List<UsersDto> skillList();

@@ -4,6 +4,7 @@
 
 <!-- 사원 리스트 출력/ 페이징 처리 -->
 <select id="getSearchList" parameterType="map" resultType="searchDto">
+
 	SELECT * 
 	from( SELECT list.*, ROWNUM as RNUM
 	    from(
@@ -44,10 +45,9 @@
 					${keyword_type} cs.skill_name LIKE '%' || #{keyword} || '%'
 				</if>
 			</where>
-	        ORDER BY a.staff_no DESC) list)
+	        ORDER BY a.staff_no DESC
+	    )list)
 	WHERE RNUM BETWEEN #{startRow} AND #{endRow}
-
-	
 
 </select>
 <!-- rownum가져오기 -->
