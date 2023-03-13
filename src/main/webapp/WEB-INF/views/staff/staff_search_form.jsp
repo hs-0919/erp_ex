@@ -239,7 +239,7 @@ $(function(){
 						<li class="page-item ${UsersDto.pageNum == i ? "active":"" }">
 							<c:choose>
 								<c:when test="${i == pageNum}">
-									<a class="page-link" href="redirect:${pageContext.request.contextPath}/staff/staff_search_form.do?pageNum=${i}">${i} </a>
+									<a class="page-link" href="${pageContext.request.contextPath}/staff/staff_search_form.do?pageNum=${i}">${i} </a>
 								</c:when>
 								<c:when test="${i != pageNum }">
 									<a class="page-link" href="${pageContext.request.contextPath}/staff/staff_search_form.do?pageNum=${i}">${i} </a>
@@ -247,9 +247,9 @@ $(function(){
 							</c:choose>
 						</li>
 					</c:forEach>
-					<c:if test="${pageNum != maxPage && !empty list}">
+					<c:if test="${pageNum ne maxPage}">
 						<li class="page-item">
-							<a href="${pageContext.request.contextPath}/staff/staff_search_form.do?pageNum=${pageNum + 1}">다음</a>
+							<a class="page-link" href="${pageContext.request.contextPath}/staff/staff_search_form.do?pageNum=${pageNum + 1}">다음</a>
 						</li>
 					</c:if>
 				</ul>
