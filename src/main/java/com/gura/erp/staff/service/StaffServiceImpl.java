@@ -73,10 +73,11 @@ public class StaffServiceImpl implements StaffService{
 	
 	@Override 
 	public int insertSk(Map<Object, Object> map1) { 
-		System.out.println("ser"+map1.get("skill_code"));
-		System.out.println("ser"+map1.get("staff_no"));
+		//System.out.println("ser"+map1.get("skill_code"));
+		//System.out.println("ser"+map1.get("staff_no"));
 		return dao.insertSkill(map1); 
 	}
+	//수정
 	@Override
 	public int updateUser(UsersDto dto) {
 		System.out.println("ser1"+dto.getStaff_no());

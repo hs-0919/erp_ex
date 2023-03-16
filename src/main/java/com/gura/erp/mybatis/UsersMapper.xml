@@ -45,6 +45,7 @@ SELECT *
 	(staff_no, staff_name, jumin_no, school_code, department_code, graduate_day, gender, jumin_no2)
 	VALUES(staff_seq.nextval, #{staff_name}, #{jumin_no}, #{school_code}, #{department_code}, #{graduateDayS}, #{gender}, #{jumin_no2})
 </insert>
+
 <!-- 사원 skill추가 -->
 <insert id="insertSkill" parameterType="map">
 	<selectKey keyProperty="staff_no" resultType="Integer" order="BEFORE">
@@ -59,6 +60,7 @@ SELECT *
 		</foreach>
 	) SK
 </insert>
+
 <!-- 사원 번호 가져오기 -->
 <select id="getUserNo" resultType="int">
 	select staff_no from staff where staff_no = #{staff_no}
