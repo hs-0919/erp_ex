@@ -198,10 +198,6 @@ public class StaffController {
 		System.out.println(data.toString());
 		model.addAttribute("keyword",keyword);
 		model.addAttribute("col",col);
-		
-		
-
-		
 
 		return "staff/staff_search";
 		
@@ -320,19 +316,13 @@ public class StaffController {
 	//사원 삭제
 	@RequestMapping(value="/staff/delete.do")
 	public String delete(@RequestParam(value="staff_no", required=true) int staff_no, @ModelAttribute UsersDto dto) {
-		System.out.println("넘어온 del no : " + staff_no);
-		//사원 번호 가져오기
-		System.out.println("넘어온 del no : " + staff_no);
+		//System.out.println("넘어온 del no : " + staff_no);
+		//System.out.println("넘어온 del no : " + staff_no);
 		//Service 객체를 이용해서 사원 스킬 정보 삭제하기
 		service.deleteSk(staff_no);
 		//Service 객체를 이용해서 사원 정보 삭제하기
 		service.deleteUser(staff_no);
 
-		/* /staff/staff_search_form.do  요청을 다시 하도록 리다일렉트 이동 시킨다
-		      리다일렉트 이동은 특정경로로 요청을 다시 하라고 강요하는 응답이다.
-		      
-		   "redirect: context 경로를 제외한 요청을 다시할 절대경로 " 
-		*/
 		return ("redirect:/staff/staff_search_form.do");
 	}
 	

@@ -83,7 +83,7 @@ public class StaffServiceImpl implements StaffService{
 		System.out.println("ser1"+dto.getStaff_no());
 		return dao.update(dto);
 	}
-	//수정
+	//스킬 수정
 	@Override 
 	public int updateSk(Map<Object, Object> updsk) { 
 		System.out.println("ser2"+updsk.get("skill_code"));
